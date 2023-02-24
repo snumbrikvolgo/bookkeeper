@@ -13,7 +13,6 @@ cat_repo = MemoryRepository[Category]()
 exp_repo = MemoryRepository[Expense]()
 bud_repo = MemoryRepository[Budget]()
 
-
 cats = '''
 продукты
     мясо
@@ -60,4 +59,3 @@ while True:
             bud = Budget(int(names[0]), cat.pk, int(names[2]))
             bud_repo.add(bud)
             print(bud)
-

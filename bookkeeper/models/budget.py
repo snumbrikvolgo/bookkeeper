@@ -2,6 +2,8 @@
 Модель бюджета
 """
 from dataclasses import dataclass
+
+
 @dataclass(slots=True)
 class Budget:
     """

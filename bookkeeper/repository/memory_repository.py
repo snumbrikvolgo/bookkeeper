@@ -12,6 +12,8 @@ class MemoryRepository(AbstractRepository[T]):
     """
     Репозиторий, работающий в оперативной памяти. Хранит данные в словаре.
     """
+    _container: dict[int, T]
+    _counter: count[int]
 
     def __init__(self) -> None:
         self._container: dict[int, T] = {}

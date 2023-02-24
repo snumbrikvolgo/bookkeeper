@@ -17,8 +17,6 @@ def create_database():
         cur.execute(f"CREATE TABLE custom(f1, f2)")
     con.close()
 
-
-
 @pytest.fixture
 def custom_class():
     @dataclass
@@ -38,7 +36,6 @@ def repo(custom_class, create_database):
 
 def test_cannot_add_with_pk(repo, custom_class):
     obj = custom_class(pk=5)
-    print(obj)
     with pytest.raises(ValueError):
         repo.add(obj)
 
@@ -75,3 +72,91 @@ def test_get_all_with_condition(repo, custom_class):
         assert repo.get_all({'f2': str(i)}) == [objects[i]]
     assert repo.get_all({'f1': 16}) == objects
 
+def test_get_getall(repo, custom_class):
+    obj = custom_class(f1=0, f2="test_get")
+    repo.add(obj)
+    assert repo.get_all() == [obj] 
+    assert repo.get(1) == obj
+    assert [repo.get(1)] == repo.get_all()
+
+
+def test_update(repo, custom_class):
+    objects1 = [custom_class(f1=int(i)) for i in range(5)]
+    for o in objects1:
+        repo.add(o)
+    assert repo.get_all() == objects1
+
+    obj_upd = custom_class(f1=0, f2="test_update", pk=3)
+    repo.update(obj_upd)
+    obj_get = repo.get(3)
+    assert repo.get_all() != objects1
+
+    assert obj_get.pk == obj_upd.pk
+    assert obj_get.f1 == obj_upd.f1
+    assert obj_get.f2 == obj_upd.f2
+
+
+def test_update(repo, custom_class):
+    objects1 = [custom_class(f1=int(i)) for i in range(5)]
+    for o in objects1:
+        repo.add(o)
+    assert repo.get_all() == objects1
+
+    obj_upd = custom_class(f1=0, f2="test_update", pk=3)
+    repo.update(obj_upd)
+    obj_get = repo.get(3)
+    assert repo.get_all() != objects1
+
+    assert obj_get.pk == obj_upd.pk
+    assert obj_get.f1 == obj_upd.f1
+    assert obj_get.f2 == obj_upd.f2
+
+
+def test_update_unexcistence(repo, custom_class):
+    objects1 = [custom_class(f1=int(i)) for i in range(5)]
+    for o in objects1:
+        repo.add(o)
+    assert repo.get_all() == objects1
+
+    obj_upd = custom_class(f1=0, f2="test_update", pk=10)
+    with pytest.raises(ValueError):
+        repo.update(obj_upd)
+
+def test_update_no_pk(repo, custom_class):
+    objects1 = [custom_class(f1=int(i)) for i in range(5)]
+    for o in objects1:
+        repo.add(o)
+    assert repo.get_all() == objects1
+
+    obj_upd = custom_class(f1=0, f2="test_update")
+    with pytest.raises(ValueError):
+        repo.update(obj_upd)
+
+def test_delete_one(repo, custom_class):
+    obj=custom_class(f1=10, f2='kek')
+    repo.add(obj)
+    assert repo.get_all() == [obj]
+    repo.delete(obj.pk)
+    assert repo.get_all() == []
+
+
+def test_delete_middle(repo, custom_class):
+    objects1 = [custom_class(f1=int(i)) for i in range(5)]
+    for o in objects1:
+        repo.add(o)
+    assert repo.get_all() == objects1
+    repo.delete(objects1[2].pk)
+    objects1.pop(2)
+    assert repo.get_all() == objects1
+
+def test_crud(repo, custom_class):
+    obj = custom_class()
+    pk = repo.add(obj)
+    assert obj.pk == pk
+    assert repo.get(pk) == obj
+    obj2 = custom_class()
+    obj2.pk = pk
+    repo.update(obj2)
+    assert repo.get(pk) == obj2
+    repo.delete(pk)
+    assert repo.get(pk) is None
