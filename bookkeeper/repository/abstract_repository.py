@@ -6,7 +6,6 @@
 в репозитории, должны поддерживать добавление атрибута pk и не должны
 использовать его для иных целей.
 """
-
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Protocol, Any
 
