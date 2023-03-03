@@ -3,7 +3,7 @@
 """
 
 from itertools import count
-from typing import Any
+from typing import Any, Iterator
 
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
@@ -13,7 +13,7 @@ class MemoryRepository(AbstractRepository[T]):
     Репозиторий, работающий в оперативной памяти. Хранит данные в словаре.
     """
     _container: dict[int, T]
-    _counter: count[int]
+    _counter: Iterator[int]
 
     def __init__(self) -> None:
         self._container: dict[int, T] = {}
