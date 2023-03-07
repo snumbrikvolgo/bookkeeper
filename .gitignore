@@ -128,6 +128,8 @@ ENV/
 env.bak/
 venv.bak/
 
+bookkeeper/table_creator.py
+database/
 # Spyder project settings
 .spyderproject
 .spyproject

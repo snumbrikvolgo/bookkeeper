@@ -1,102 +1,108 @@
 from PySide6 import QtWidgets
-from PySide6.QtCore import SignalInstance
 
-from bookkeeper.view.labels import GroupLabel, LabeledComboBoxInput, LabeledLineInput
-from bookkeeper.utils import read_tree
-from bookkeeper.repository.memory_repository import MemoryRepository
+from bookkeeper.view.labels import GroupLabelCenter, LabeledComboBoxInput, LabeledLineInput
 from bookkeeper.models.category import Category
 
-
-cats = '''
-продукты
-    мясо
-        сырое мясо
-        мясные продукты
-    сладости
-книги
-одежда
-'''.splitlines()
-
-class CatsEditWindow(QtWidgets.QWidget):
-    window_closed = SignalInstance()
-    def __init__(self, cat_repo, *args, **kwargs):
+class CategoryEditWindow(QtWidgets.QWidget):
+    def __init__(self, cats: list[Category],
+                 cat_adder, cat_deleter, cat_modifier, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.vbox = QtWidgets.QVBoxLayout()
-        self.label = GroupLabel("<b>Список категорий</b>")
-        self.vbox.addWidget(self.label)
+        self.grid = QtWidgets.QGridLayout()
+        self.label = GroupLabelCenter("<b>Список категорий</b>")
+        self.grid.addWidget(self.label, 0, 0, 1, 2)
+
         self.cats_tree = QtWidgets.QTreeWidget()
-        self.cats_tree.setColumnCount(1)
+        self.cats_tree.setHeaderLabel("")
+        self.grid.addWidget(self.cats_tree, 1, 0, 1, 2)
 
-        self.cat_repo = cat_repo
-        # Category.create_from_tree(read_tree(cats), self.cat_repo)
+        self.label = GroupLabelCenter("<b>Удаление категории</b>")
+        self.grid.addWidget(self.label, 2, 0, 1, 2)
+
+        self.cat_del = LabeledComboBoxInput("Категория", [])
+        self.grid.addWidget(self.cat_del, 3, 0, 1, 1)
+
+        self.cat_del_button = QtWidgets.QPushButton('Удалить')
+        self.cat_del_button.clicked.connect(self.delete_category)
+        self.grid.addWidget(self.cat_del_button, 3, 1, 1, 1)
+
+        self.label = GroupLabelCenter("<b>Добавление категории</b>")
+        self.grid.addWidget(self.label, 4, 0, 1, 2)
+
+        self.cat_add_parent = LabeledComboBoxInput("Родитель", [])
+        self.grid.addWidget(self.cat_add_parent, 5, 0, 1, 1)
+
+        self.cat_add_name = LabeledLineInput("Название", "Новая категория")
+        self.grid.addWidget(self.cat_add_name, 6, 0, 1, 1)
+
+        self.cat_add_button = QtWidgets.QPushButton('Добавить')
+        self.cat_add_button.clicked.connect(self.add_category)
+        self.grid.addWidget(self.cat_add_button, 6, 1, 1, 1)
+
+        self.setLayout(self.grid)
+        self.cat_adder = cat_adder
+        self.cat_deleter = cat_deleter
+        self.cat_modifier = cat_modifier
+
+        self.set_categories(cats)
+
+    def set_categories(self, cats: list[Category]):
+        self.categories = cats
+        self.cat_names = [c.name for c in cats]
         top_items = self.find_children()
+        self.cats_tree.clear()
         self.cats_tree.insertTopLevelItems(0, top_items)
-        self.vbox.addWidget(self.cats_tree)
+        self.cat_del.set_items(self.cat_names)
+        self.cat_names.append("Нет в списке")
+        self.cat_add_parent.set_items(self.cat_names)
 
-        cat_names = []
-        for cat in self.cat_repo.get_all():
-            cat_names.append(cat.name)
-        cat_names.append("Нет в списке")
-        print('enter')
-        self.parent_input = LabeledComboBoxInput("Чья подкатегория?", cat_names)
-        self.vbox.addWidget(self.parent_input)
+    def delete_category(self):
+        self.cat_deleter(self.cat_del.text())
+        print(f"Категория {self.cat_del.text()} удалена")
+        self.cat_del.clear()
+        # todo: upd cat tree view
 
-        self.category_input = LabeledLineInput("Название новой категории", "")
-        self.vbox.addWidget(self.category_input)
-
-        self.submit_button = QtWidgets.QPushButton('Добавить')
-        self.submit_button.clicked.connect(self.submit)
-        self.vbox.addWidget(self.submit_button)
-        self.setLayout(self.vbox)
-
-    # def closeEvent(self, event):
-    #     print('close')
-    #     self.window_closed.emit()
-    #     event.accept()
-
+    def add_category(self):
+        if self.cat_add_parent.text() == "Без родительской категории":
+            self.cat_adder(self.cat_add_name.text(), None)
+            print(f"Категория '{self.cat_add_name.text()}' добавлена")
+        else:
+            self.cat_adder(self.cat_add_name.text(), self.cat_add_parent.text())
+            print(f"Подкатегория '{self.cat_add_name.text()}' категории" 
+                  + f"'{self.cat_add_parent.text()}' добавлена")
+        self.cat_add_name.clear()
+        self.cat_add_parent.clear()
+        # todo: upd cat tree view
+    
     def find_children(self, parent_pk=None):
         items = []
-        children = self.cat_repo.get_all(where={'parent':parent_pk})
+        children = [c for c in self.categories if c.parent == parent_pk]
         for child in children:
             item = QtWidgets.QTreeWidgetItem([child.name])
             item.addChildren(self.find_children(parent_pk=child.pk))
             items.append(item)
         return items
     
-    def submit(self):
-        print(f"Новая категория {self.category_input.text()} в раздел {self.parent_input.text()} добавлена")
-        self.cat_repo.add(Category(self.category_input.text(), self.find_pk_by_name(self.parent_input.text())))
-        print(self.cat_repo.get_all())
-        self.parent_input.clear()
-        self.category_input.clear()
-
-    def find_pk_by_name(self, name):
-        for item in self.cat_repo.get_all():
-            if (item.name == name):
-                return item.pk
-
 class NewExpense(QtWidgets.QGroupBox):
-    categories = [f"Категория {i}" for i in range(5)]
-    def __init__(self, *args, **kwargs):
+
+    def __init__(self, cats:list[Category], show_category_edit_window, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.categories = cats
+        self.show_category_edit_window = show_category_edit_window
+        self.cat_names = [c.name for c in cats]
+
         self.grid = QtWidgets.QGridLayout()
-        self.label = GroupLabel("<b>Новая трата</b>")
+        self.label = GroupLabelCenter("<b>Новая трата</b>")
         self.grid.addWidget(self.label,0,0,1,3)
 
         self.amount_input = LabeledLineInput("Сумма", "0")
         self.grid.addWidget(self.amount_input,1,0,1,2)
 
-        self.cat_repo = MemoryRepository[Category]()
-        Category.create_from_tree(read_tree(cats), self.cat_repo)
-        cat_names = []
-        for cat in self.cat_repo.get_all():
-            cat_names.append(cat.name)
-        # print(self.cat_repo.get_all())
-        self.category_input = LabeledComboBoxInput("Категория", cat_names)
+
+        self.category_input = LabeledComboBoxInput("Категория", self.cat_names)
         self.grid.addWidget(self.category_input,2,0,1,2)
 
         self.cats_edit_button = QtWidgets.QPushButton('Редактировать')
-        self.cats_edit_button.clicked.connect(self.cats_edit)
+        self.cats_edit_button.clicked.connect(self.show_category_edit_window)
         self.grid.addWidget(self.cats_edit_button,2,2,1,1)
 
         self.submit_button = QtWidgets.QPushButton('Добавить')
@@ -109,11 +115,12 @@ class NewExpense(QtWidgets.QGroupBox):
         self.amount_input.clear()
         self.category_input.clear()
     
-    def cats_edit(self):
-        self.window = CatsEditWindow(self.cat_repo)
-        self.window.resize(400, 400)
-        self.window.show()
-        # self.window.window_closed.connect(self.do_something)
+    def edit_categories(self):
+        self.widow = CategoryEditWindow(self.cat_repo)
+        self.win.resize(400, 400)
+        self.win.show()
 
-    def do_something(self):
-        print("You closed the second window!")
+    def set_categories(self, cats: list[Category]):
+        self.categories = cats
+        self.cat_names = [c.name for c in cats]
+        self.category_input.set_items(self.cat_names)

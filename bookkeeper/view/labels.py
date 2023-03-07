@@ -25,9 +25,10 @@ class LabeledComboBoxInput(QtWidgets.QWidget):
         self.label = QtWidgets.QLabel(text)
         self.layout.addWidget(self.label, stretch=1)
         self.combo_box = QtWidgets.QComboBox()
-        self.items = items
-        self.combo_box.addItems(items)
-        self.combo_box.setPlaceholderText(items[0])
+        self.combo_box.setEditable(True)
+        self.combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.combo_box.setMaxVisibleItems(16)
+        self.set_items(items)
         self.layout.addWidget(self.combo_box, stretch=5)
         self.setLayout(self.layout)
 
@@ -36,8 +37,17 @@ class LabeledComboBoxInput(QtWidgets.QWidget):
 
     def text(self):
         return self.combo_box.currentText()
-
-class GroupLabel(QtWidgets.QLabel):
+    def set_items(self, items: list[str]):
+        self.items = items
+        self.combo_box.clear()
+        self.combo_box.addItems(items)
+        if len(items) != 0:
+            self.combo_box.setPlaceholderText(items[0])
+        else:
+            self.combo_box.setPlaceholderText("")
+        self.clear()
+        
+class GroupLabelCenter(QtWidgets.QLabel):
     def __init__(self, text, *args, **kwargs):
         super().__init__(text, *args, **kwargs)
         self.setAlignment(Qt.AlignCenter)
