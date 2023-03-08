@@ -12,7 +12,7 @@ class MainWindow(QtWidgets.QWidget):
         self.vbox = QtWidgets.QVBoxLayout()
         self.setWindowTitle("The Bookkeeper App")
         self.expenses_table = expenses_table
-        self.vbox.addWidget(self.expenses_table, stretch=8)
+        self.vbox.addWidget(self.expenses_table, stretch=10)
         self.new_expense = new_expense
         self.vbox.addWidget(self.new_expense, stretch=3)
         self.budget_table = budget_table

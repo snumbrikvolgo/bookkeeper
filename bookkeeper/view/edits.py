@@ -21,6 +21,9 @@ class CategoryEditWindow(QtWidgets.QWidget):
         self.cat_del = LabeledComboBoxInput("Категория", [])
         self.grid.addWidget(self.cat_del, 3, 0, 1, 1)
 
+        # self.calendar = QtWidgets.QCalendarWidget()
+        # self.grid.addWidget(self.calendar)
+
         self.cat_del_button = QtWidgets.QPushButton('Удалить')
         self.cat_del_button.clicked.connect(self.delete_category)
         self.grid.addWidget(self.cat_del_button, 3, 1, 1, 1)
@@ -57,9 +60,9 @@ class CategoryEditWindow(QtWidgets.QWidget):
 
     def delete_category(self):
         self.cat_deleter(self.cat_del.text())
+        #TODO proper text
         print(f"Категория {self.cat_del.text()} удалена")
         self.cat_del.clear()
-        # todo: upd cat tree view
 
     def add_category(self):
         if self.cat_add_parent.text() == "Без родительской категории":
@@ -67,11 +70,10 @@ class CategoryEditWindow(QtWidgets.QWidget):
             print(f"Категория '{self.cat_add_name.text()}' добавлена")
         else:
             self.cat_adder(self.cat_add_name.text(), self.cat_add_parent.text())
-            print(f"Подкатегория '{self.cat_add_name.text()}' категории" 
+            print(f"Подкатегория '{self.cat_add_name.text()}' категории " 
                   + f"'{self.cat_add_parent.text()}' добавлена")
         self.cat_add_name.clear()
         self.cat_add_parent.clear()
-        # todo: upd cat tree view
     
     def find_children(self, parent_pk=None):
         items = []
@@ -84,33 +86,39 @@ class CategoryEditWindow(QtWidgets.QWidget):
     
 class NewExpense(QtWidgets.QGroupBox):
 
-    def __init__(self, cats:list[Category], show_category_edit_window, *args, **kwargs):
+    def __init__(self, cats:list[Category], show_category_edit_window, exp_adder,\
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.categories = cats
         self.show_category_edit_window = show_category_edit_window
+        self.exp_adder = exp_adder
         self.cat_names = [c.name for c in cats]
 
         self.grid = QtWidgets.QGridLayout()
         self.label = GroupLabelCenter("<b>Новая трата</b>")
-        self.grid.addWidget(self.label,0,0,1,3)
+        self.grid.addWidget(self.label,0,0,1,5)
 
         self.amount_input = LabeledLineInput("Сумма", "0")
         self.grid.addWidget(self.amount_input,1,0,1,2)
 
+        self.comment_input = LabeledLineInput("Комментарий", "")
+        self.grid.addWidget(self.comment_input,2,0,1,5)
 
         self.category_input = LabeledComboBoxInput("Категория", self.cat_names)
-        self.grid.addWidget(self.category_input,2,0,1,2)
+        self.grid.addWidget(self.category_input,3,0,1,2)
 
         self.cats_edit_button = QtWidgets.QPushButton('Редактировать')
         self.cats_edit_button.clicked.connect(self.show_category_edit_window)
-        self.grid.addWidget(self.cats_edit_button,2,2,1,1)
+        self.grid.addWidget(self.cats_edit_button,3,2,1,3)
 
         self.submit_button = QtWidgets.QPushButton('Добавить')
         self.submit_button.clicked.connect(self.submit)
-        self.grid.addWidget(self.submit_button,3,0,1,3)
+        self.grid.addWidget(self.submit_button,4,0,1,5)
         self.setLayout(self.grid)
     
     def submit(self):
+        self.exp_adder(self.amount_input.text(), 
+                       self.category_input.text(), self.comment_input.text())
         print(f"Новая трата в категории {self.category_input.text()} на сумму {self.amount_input.text()} добавлена")
         self.amount_input.clear()
         self.category_input.clear()

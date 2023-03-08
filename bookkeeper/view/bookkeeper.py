@@ -59,18 +59,22 @@ class Bookkeeper:
         self.categories.append(cat)
         self.view.set_category_list(self.categories)
         
-    def delete_cat(self, name, parent):
-        pass
-
+    def delete_cat(self, cat):
+        children = self.category_rep.get_all(where={'parent':cat.pk})
+        self.category_rep.delete(cat.pk)
+        for child in children:
+            self.category_rep.delete(child.pk)
+        self.categories = self.category_rep.get_all()
+        self.view.set_category_list(self.categories)
+        
     def modify_exp(self):
         pass
     
     def add_exp(self, amount, category, comment):
         exp = Expense(amount=amount, category=category, comment=comment)
         self.expenses_rep.add(exp)
+        self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
-
-
         
     def delete_exp(self, name, parent):
         pass

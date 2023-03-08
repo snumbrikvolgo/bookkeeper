@@ -17,7 +17,11 @@ class AbstractView(Protocol):
         pass
     def set_category_list(cats : list[Category]) -> None:
         pass
-    
+    def set_expenses_list(exps : list[Expense]) -> None:
+        pass
+    def set_budget_list(buds: list[Budget]) -> None:
+        pass
+
     def register_cat_modifier(handler: Callable[[Category], None]):
         pass
     def register_cat_deleter(handler: Callable[[Category], None]):
@@ -44,6 +48,9 @@ def handle_error(widget, handler):
 class View:
 
     categories: list[Category] = []
+    expenses: list[Expense] = []
+    budget: list[Budget] = []
+
     main_window: MainWindow
     budget_table: BudgetTable
     new_expense: NewExpense
@@ -55,11 +62,12 @@ class View:
         #self.app.setQuitOnLastWindowClosed(False)
         self.app.setStyle("Fusion")
         self.category_edit_window()
-        self.budget_table = BudgetTable()
+        self.budget_table = BudgetTable(self.budget)
         self.new_expense = NewExpense(self.categories,\
-                                       self.show_category_edit_window
+                                       self.show_category_edit_window,
+                                       self.add_expense,\
                                     )
-        self.expenses_table = ExpensesTable()
+        self.expenses_table = ExpensesTable(self.expenses, self.delete_expense, self.modify_expense)
         self.main_window = MainWindow(self.budget_table, 
                                     self.new_expense, 
                                       self.expenses_table)
@@ -108,7 +116,6 @@ class View:
     def register_exp_deleter(self, handler):
         self.exp_deleter = handle_error(self.main_window, handler)    
     def register_exp_adder(self, handler):
-        print('jui')
         self.exp_adder = handle_error(self.main_window, handler)    
 
 
@@ -119,9 +126,11 @@ class View:
         # except ValidationError as ex:
         #     QMessageBox.critical(self, 'Ошибка', str(ex))
     def delete_category(self, name):
-        cat = ... # определить выбранную категорию
-        del_subcats, del_expenses = self.ask_del_cat()
-        self.cat_deleter(cat, del_subcats, del_expenses)
+        cat = [c for c in self.categories if c.name == name][0]
+        # del_subcats, del_expenses = self.ask_del_cat()
+        # self.cat_deleter(cat, del_subcats, del_expenses)
+        self.cat_deleter(cat)
+
     def modify_category(self, cat: Category):
         self.cat_modifier(cat)
 
