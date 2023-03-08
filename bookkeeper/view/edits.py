@@ -65,7 +65,7 @@ class CategoryEditWindow(QtWidgets.QWidget):
         self.cat_del.clear()
 
     def add_category(self):
-        if self.cat_add_parent.text() == "Без родительской категории":
+        if self.cat_add_parent.text() == "Нет в списке":
             self.cat_adder(self.cat_add_name.text(), None)
             print(f"Категория '{self.cat_add_name.text()}' добавлена")
         else:

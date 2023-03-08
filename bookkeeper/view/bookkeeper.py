@@ -37,13 +37,7 @@ class Bookkeeper:
 
     def run(self):
         self.view.show_main_window()
-        
-    def modify_cat(self, cat: Category) -> None:
-        if cat not in [c.name for c in self.categories]:
-            raise ValueError(f'Категории {cat.name} не существует')
-        self.category_rep.update(cat)
-        self.view.set_category_list(self.categories)
-
+    
     def add_cat(self, name, parent):
         if name in [c.name for c in self.categories]:
             raise ValueError(f'Категория {name} уже существует')
@@ -54,28 +48,41 @@ class Bookkeeper:
         else:
             parent_pk = None
         cat = Category(name, parent_pk)
-
         self.category_rep.add(cat)
         self.categories.append(cat)
         self.view.set_category_list(self.categories)
         
+
+    def modify_cat(self, cat: Category) -> None:
+        if cat not in [c.name for c in self.categories]:
+            raise ValueError(f'Категории {cat.name} не существует')
+        self.category_rep.update(cat)
+        self.view.set_category_list(self.categories)
+
     def delete_cat(self, cat):
         children = self.category_rep.get_all(where={'parent':cat.pk})
         self.category_rep.delete(cat.pk)
+        for exp in self.expenses_rep.get_all(where={'category':cat.name}):
+                self.expenses_rep.delete(exp.pk)
         for child in children:
             self.category_rep.delete(child.pk)
+            for exp in self.expenses_rep.get_all(where={'category':child.name}):
+                self.expenses_rep.delete(exp.pk)
         self.categories = self.category_rep.get_all()
+        self.expenses = self.expenses_rep.get_all()
+
         self.view.set_category_list(self.categories)
-        
-    def modify_exp(self):
-        pass
-    
+        self.view.set_expenses_list(self.expenses)
+
     def add_exp(self, amount, category, comment):
         exp = Expense(amount=amount, category=category, comment=comment)
         self.expenses_rep.add(exp)
         self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
         
+    def modify_exp(self):
+        pass
+
     def delete_exp(self, name, parent):
         pass
 
