@@ -15,6 +15,7 @@ class AbstractView(Protocol):
 
     def show_main_window() -> None:
         pass
+
     def set_category_list(cats : list[Category]) -> None:
         pass
     def set_expenses_list(exps : list[Expense]) -> None:
@@ -22,19 +23,21 @@ class AbstractView(Protocol):
     def set_budget_list(buds: list[Budget]) -> None:
         pass
 
+    def register_cat_adder(handler: Callable[[Category], None]):
+        pass
     def register_cat_modifier(handler: Callable[[Category], None]):
         pass
     def register_cat_deleter(handler: Callable[[Category], None]):
         pass
-    def register_cat_adder(handler: Callable[[Category], None]):
-        pass
 
+
+    def register_exp_adder(handler: Callable[[Expense], None]):
+        pass
     def register_exp_modifier(handler: Callable[[Expense], None]):
         pass
     def register_exp_deleter(handler: Callable[[Expense], None]):
         pass
-    def register_exp_adder(handler: Callable[[Expense], None]):
-        pass
+
 
 
 def handle_error(widget, handler):
@@ -105,23 +108,23 @@ class View:
         self.budget = buds
         self.budget_table.set_budget(self.budget)
 
+    def register_cat_adder(self, handler):
+        self.cat_adder = handle_error(self.main_window, handler)
+
     def register_cat_modifier(self, handler: Callable[[Category], None]):
         self.cat_modifier = handle_error(self.main_window, handler)
 
     def register_cat_deleter(self, handler: Callable[[Category], None]):
         self.cat_deleter = handle_error(self.main_window, handler)
 
-    def register_cat_adder(self, handler):
-        self.cat_adder = handle_error(self.main_window, handler)
+    def register_exp_adder(self, handler):
+        self.exp_adder = handle_error(self.main_window, handler)    
 
     def register_exp_modifier(self, handler):
         self.exp_modifier = handle_error(self.main_window, handler)
 
     def register_exp_deleter(self, handler):
         self.exp_deleter = handle_error(self.main_window, handler)
-
-    def register_exp_adder(self, handler):
-        self.exp_adder = handle_error(self.main_window, handler)    
 
     def add_category(self, name, parent):
         self.cat_adder(name, parent)

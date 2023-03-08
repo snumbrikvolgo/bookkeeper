@@ -29,7 +29,9 @@ class LabeledComboBoxInput(QtWidgets.QWidget):
         self.combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.combo_box.setMaxVisibleItems(16)
         self.set_items(items)
+        self.combo_box.setEditable(False)
         self.layout.addWidget(self.combo_box, stretch=5)
+
         self.setLayout(self.layout)
 
     def clear(self):

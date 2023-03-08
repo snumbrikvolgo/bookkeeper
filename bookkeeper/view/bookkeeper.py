@@ -73,7 +73,11 @@ class Bookkeeper:
         self.view.set_category_list(self.categories)
         self.view.set_expenses_list(self.expenses)
 
-    def add_exp(self, amount, category, comment):
+    def add_exp(self, amount: str, category: str, comment: str):
+        amount = int(amount)
+        if  (amount <= 0):
+            raise ValueError(f'Стоимость покупки должна быть'\
+                             +'целым положительным числом')
         exp = Expense(amount=amount, category=category, comment=comment)
         self.expenses_rep.add(exp)
         self.expenses = self.expenses_rep.get_all()
