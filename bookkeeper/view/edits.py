@@ -59,9 +59,9 @@ class CategoryEditWindow(QtWidgets.QWidget):
         self.cat_add_parent.set_items(self.cat_names)
 
     def delete_category(self):
+        name = self.cat_del.text()
         self.cat_deleter(self.cat_del.text())
-        #TODO proper text
-        print(f"Категория {self.cat_del.text()} удалена")
+        print(f"Категория {name} удалена")
         self.cat_del.clear()
 
     def add_category(self):

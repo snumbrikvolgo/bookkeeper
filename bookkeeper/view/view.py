@@ -67,7 +67,8 @@ class View:
                                        self.show_category_edit_window,
                                        self.add_expense,\
                                     )
-        self.expenses_table = ExpensesTable(self.expenses, self.delete_expense, self.modify_expense)
+        self.expenses_table = ExpensesTable(self.expenses, self.delete_expense,
+                                            self.modify_expense)
         self.main_window = MainWindow(self.budget_table, 
                                     self.new_expense, 
                                       self.expenses_table)
@@ -106,18 +107,21 @@ class View:
 
     def register_cat_modifier(self, handler: Callable[[Category], None]):
         self.cat_modifier = handle_error(self.main_window, handler)
+
     def register_cat_deleter(self, handler: Callable[[Category], None]):
         self.cat_deleter = handle_error(self.main_window, handler)
+
     def register_cat_adder(self, handler):
         self.cat_adder = handle_error(self.main_window, handler)
 
     def register_exp_modifier(self, handler):
-        self.exp_modifier = handle_error(self.main_window, handler)    
+        self.exp_modifier = handle_error(self.main_window, handler)
+
     def register_exp_deleter(self, handler):
-        self.exp_deleter = handle_error(self.main_window, handler)    
+        self.exp_deleter = handle_error(self.main_window, handler)
+
     def register_exp_adder(self, handler):
         self.exp_adder = handle_error(self.main_window, handler)    
-
 
     def add_category(self, name, parent):
         self.cat_adder(name, parent)
@@ -125,18 +129,20 @@ class View:
         #     self.cat_adder(name, parent)
         # except ValidationError as ex:
         #     QMessageBox.critical(self, 'Ошибка', str(ex))
+    def modify_category(self, cat: Category):
+        self.cat_modifier(cat)
+
     def delete_category(self, name):
         cat = [c for c in self.categories if c.name == name][0]
         # del_subcats, del_expenses = self.ask_del_cat()
         # self.cat_deleter(cat, del_subcats, del_expenses)
         self.cat_deleter(cat)
 
-    def modify_category(self, cat: Category):
-        self.cat_modifier(cat)
-
     def add_expense(self, amount, category, comment):
         self.exp_adder(amount, category, comment)
-    def delete_expense(self):
-        pass
+
     def modify_expense(self):
+        pass
+
+    def delete_expense(self):
         pass

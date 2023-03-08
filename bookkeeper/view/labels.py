@@ -37,6 +37,7 @@ class LabeledComboBoxInput(QtWidgets.QWidget):
 
     def text(self):
         return self.combo_box.currentText()
+    
     def set_items(self, items: list[str]):
         self.items = items
         self.combo_box.clear()

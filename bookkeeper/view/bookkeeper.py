@@ -52,7 +52,6 @@ class Bookkeeper:
         self.categories.append(cat)
         self.view.set_category_list(self.categories)
         
-
     def modify_cat(self, cat: Category) -> None:
         if cat not in [c.name for c in self.categories]:
             raise ValueError(f'Категории {cat.name} не существует')
@@ -83,7 +82,7 @@ class Bookkeeper:
     def modify_exp(self):
         pass
 
-    def delete_exp(self, name, parent):
+    def delete_exp(self):
         pass
 
 
