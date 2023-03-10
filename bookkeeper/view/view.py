@@ -137,9 +137,11 @@ class View:
 
     def delete_category(self, name):
         cat = [c for c in self.categories if c.name == name][0]
-        # del_subcats, del_expenses = self.ask_del_cat()
-        # self.cat_deleter(cat, del_subcats, del_expenses)
-        self.cat_deleter(cat)
+        reply = QtWidgets.QMessageBox.question(self.main_window, 
+                'Удаление категории',
+                'Вы уверены, что хотите удалить категорию?')
+        if reply == QtWidgets.QMessageBox.Yes:
+                self.cat_deleter(cat)
 
     def add_expense(self, amount, category, comment):
         self.exp_adder(amount, category, comment)
@@ -148,5 +150,15 @@ class View:
         self.exp_modifier(pk, attr, value, old_val)
 
     def delete_expense(self, exps_pk: list[int]):
-        self.exp_deleter(exps_pk)
+        # self.exp_deleter(exps_pk)
+        if len(exps_pk) == 0:
+            QtWidgets.QMessageBox.critical(self.main_window, 
+                            'Ошибка', 
+                            'Траты для удаления не выбраны.')
+        else:
+            reply = QtWidgets.QMessageBox.question(self.main_window, 
+                    'Удаление трат',
+                    'Вы уверены, что хотите удалить все выбранные траты?')
+            if reply == QtWidgets.QMessageBox.Yes:
+                self.exp_deleter(exps_pk)
 

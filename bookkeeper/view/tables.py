@@ -69,7 +69,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
         self.vbox.addWidget(self.exp_del_button)
 
         self.exp_mod_button = QtWidgets.QPushButton('Изменить')
-        self.exp_mod_button.clicked.connect(self.modify_exp)
+        self.exp_mod_button.clicked.connect(self.modify_button)
         self.vbox.addWidget(self.exp_mod_button)
 
         self.table.setEditTriggers(
@@ -95,14 +95,23 @@ class ExpensesTable(QtWidgets.QGroupBox):
     def double_click(self, row, columns):
         self.table.cellChanged.connect(self.modify_exp)
 
+    def modify_button(self):
+        self.table.cellClicked.connect(self.modify_exp_button)
+
+    def modify_exp_button(self, row, column):
+        old_val = self.table.item(row, column).text()
+        self.table.cellClicked.disconnect(self.modify_exp_button)
+        pk = self.table.data[row][-1]
+        new_val = self.table.item(row, column).text()
+        attr = self.col_to_attr[column]
+        self.exp_modifier(pk, attr, new_val, old_val)
+
     def modify_exp(self, row, column):
-        print('exp_modifier')
         old_val = self.table.item(row, column).text()
         self.table.cellChanged.disconnect(self.modify_exp)
         pk = self.table.data[row][-1]
         new_val = self.table.item(row, column).text()
         attr = self.col_to_attr[column]
-        print('clicked', pk, attr, new_val, old_val)
         self.exp_modifier(pk, attr, new_val, old_val)
 
     def delete_exp(self):
@@ -112,6 +121,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
             start = ch_range.topRow()
             end = min(ch_range.bottomRow(), len(self.table.data))
             pks_to_del += [i[-1] for i in self.table.data[start:end+1]]
+        print(pks_to_del)
         self.exp_deleter(pks_to_del)
 
 class BudgetTable(QtWidgets.QGroupBox):

@@ -93,13 +93,11 @@ class Bookkeeper:
             if attr == "category":
                 value = value.lower()
                 if value not in [c.name for c in self.categories]:
-                    # self.view.set_expenses(self.expenses)
                     error_str=f'Категории {value} не существует'
                     raise ValueError(f'Категории {value} не существует')
                 value = self.category_rep.get_all(where={'name':value})[0].name
             elif attr == "amount":
                 if int(value) <= 0:
-                    self.view.set_expenses_list(self.expenses)
                     error_str=f'Стоимость покупки должна быть'\
                                 +'целым положительным числом'
 
@@ -110,26 +108,19 @@ class Bookkeeper:
                     value = datetime.fromisoformat(value).isoformat(
                                                 sep=' ', timespec='seconds')
                 except ValueError:
-                    self.view.set_expenses_list(self.expenses)
                     error_str=f'Неправильный формат даты'
                     raise ValueError(error_str)
-        
             setattr(exp, attr, value)
-
         except ValueError:
             self.view.set_expenses_list(self.expenses)
             raise ValueError(error_str)
-        
         else:
             setattr(exp, attr, old_val)
-
         self.expenses_rep.update(exp)
         self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
 
     def delete_exp(self, exps_pk: list[int]):
-        if len(exps_pk) == 0:
-            raise ValueError(f'Выберите расходы')
         for pk in exps_pk:
             self.expenses_rep.delete(pk)
         self.expenses = self.expenses_rep.get_all()
