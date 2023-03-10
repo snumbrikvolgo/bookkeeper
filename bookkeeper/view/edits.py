@@ -14,6 +14,7 @@ class CategoryEditWindow(QtWidgets.QWidget):
         self.cats_tree = QtWidgets.QTreeWidget()
         self.cats_tree.setHeaderLabel("")
         self.grid.addWidget(self.cats_tree, 1, 0, 1, 2)
+        self.cats_tree.itemClicked.connect(self.once_clicked)
 
         self.label = GroupLabelCenter("<b>Удаление категории</b>")
         self.grid.addWidget(self.label, 2, 0, 1, 2)
@@ -47,6 +48,11 @@ class CategoryEditWindow(QtWidgets.QWidget):
         self.cat_modifier = cat_modifier
 
         self.set_categories(cats)
+
+    def once_clicked(self, item, column):
+            clicked_cat_name = item.text(column)
+            self.cat_del.set_text(clicked_cat_name)
+            self.cat_add_parent.set_text(clicked_cat_name)
 
     def set_categories(self, cats: list[Category]):
         self.categories = cats

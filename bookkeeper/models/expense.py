@@ -2,7 +2,7 @@
 Описан класс, представляющий расходную операцию
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 
@@ -19,7 +19,7 @@ class Expense:
     """
     amount: int
     category: int
-    expense_date: datetime = field(default_factory=datetime.now)
-    added_date: datetime = field(default_factory=datetime.now)
+    expense_date: str = datetime.now().isoformat(sep=' ', timespec='seconds')
+    added_date: str = datetime.now().isoformat(sep=' ', timespec='seconds')
     comment: str = ''
     pk: int = 0
