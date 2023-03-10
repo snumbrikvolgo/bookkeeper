@@ -144,8 +144,8 @@ class View:
     def add_expense(self, amount, category, comment):
         self.exp_adder(amount, category, comment)
 
-    def modify_expense(self, pk, attr, value):
-        self.exp_modifier(pk, attr, value)
+    def modify_expense(self, pk, attr, value, old_val):
+        self.exp_modifier(pk, attr, value, old_val)
 
     def delete_expense(self, exps_pk: list[int]):
         self.exp_deleter(exps_pk)

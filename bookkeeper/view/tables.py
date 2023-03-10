@@ -43,7 +43,7 @@ class AnyTableWidget(QtWidgets.QTableWidget):
             for j, x in enumerate(row[:-1]):
                 self.setItem(
                     i, j,
-                    QtWidgets.QTableWidgetItem(x.lower())
+                    QtWidgets.QTableWidgetItem(x)
                 )
 
 class ExpensesTable(QtWidgets.QGroupBox):
@@ -55,6 +55,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
         self.vbox.addWidget(self.label)
         self.table = AnyTableWidget(h_header_str="Дата Сумма Категория Комментарий",\
                                      row_count=30)
+        
         self.col_to_attr = {0:"expense_date", 1:"amount", 2:"category", 3:"comment"}
 
         self.set_expenses(exps)
@@ -85,8 +86,9 @@ class ExpensesTable(QtWidgets.QGroupBox):
         self.expenses.sort(key=lambda x: x.expense_date, reverse=True)
         data = []
         for exp in exps:
-            data.append([exp.expense_date,\
-                          str(exp.amount), str(exp.category), str(exp.comment), exp.pk])
+            data.append([exp.expense_date, str(exp.amount),\
+                          str(exp.category), str(exp.comment), exp.pk
+                        ])
         self.table.clearContents()
         self.table.set_data(data)
 
@@ -95,12 +97,13 @@ class ExpensesTable(QtWidgets.QGroupBox):
 
     def modify_exp(self, row, column):
         print('exp_modifier')
+        old_val = self.table.item(row, column).text()
         self.table.cellChanged.disconnect(self.modify_exp)
         pk = self.table.data[row][-1]
         new_val = self.table.item(row, column).text()
         attr = self.col_to_attr[column]
-        print('clicked', pk, attr, new_val)
-        self.exp_modifier(pk, attr, new_val)
+        print('clicked', pk, attr, new_val, old_val)
+        self.exp_modifier(pk, attr, new_val, old_val)
 
     def delete_exp(self):
         pks_to_del = []
@@ -127,9 +130,6 @@ class BudgetTable(QtWidgets.QGroupBox):
                                     row_count=3)
         self.table.set_data(self.data)
         self.vbox.addWidget(self.table)
-        # scroll = QtWidgets.QScrollArea(self)
-        # self.vbox.addWidget(scroll)
-        # scroll.setWidgetResizable(True)
         self.setLayout(self.vbox)
 
     def set_budget(self, budget: list[Budget]):
