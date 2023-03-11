@@ -88,8 +88,7 @@ class Bookkeeper:
         self.view.set_expenses_list(self.expenses)
         self.update_budgets()
 
-    def modify_exp(self, pk, attr, value, old_val):
-        print(pk, attr, value, old_val)
+    def modify_exp(self, pk: int, attr: str, value: str, old_val: str):
         exp = self.expenses_rep.get(pk)
         error_str = ''
         try:
