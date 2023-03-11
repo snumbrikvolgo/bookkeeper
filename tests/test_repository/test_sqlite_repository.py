@@ -95,23 +95,6 @@ def test_update(repo, custom_class):
     assert obj_get.f1 == obj_upd.f1
     assert obj_get.f2 == obj_upd.f2
 
-
-def test_update(repo, custom_class):
-    objects1 = [custom_class(f1=int(i)) for i in range(5)]
-    for o in objects1:
-        repo.add(o)
-    assert repo.get_all() == objects1
-
-    obj_upd = custom_class(f1=0, f2="test_update", pk=3)
-    repo.update(obj_upd)
-    obj_get = repo.get(3)
-    assert repo.get_all() != objects1
-
-    assert obj_get.pk == obj_upd.pk
-    assert obj_get.f1 == obj_upd.f1
-    assert obj_get.f2 == obj_upd.f2
-
-
 def test_update_unexcistence(repo, custom_class):
     objects1 = [custom_class(f1=int(i)) for i in range(5)]
     for o in objects1:

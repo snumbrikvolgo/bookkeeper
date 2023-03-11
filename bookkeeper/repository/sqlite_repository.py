@@ -57,11 +57,13 @@ class SQLiteRepository(AbstractRepository[T]):
             return obj
         return None
 
-    def get_all(self, where: dict[str, Any] | None = None, operator="=") -> list[T]:
+    def get_all(self, where: dict[str, Any] | None = None,
+                operator: str = "=") -> list[T]:
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             if where:
-                fields = " AND ".join([f"{k} {operator} {repr(v)}" for k, v in where.items()])
+                fields = " AND ".join([f"{k} {operator} {repr(v)}"
+                                       for k, v in where.items()])
                 rows = cur.execute(
                     f'SELECT ROWID, * FROM {self.table_name} '
                     + f'WHERE {fields}'
@@ -72,7 +74,7 @@ class SQLiteRepository(AbstractRepository[T]):
                 ).fetchall()
         con.close()
         return [self.cls(pk=r[0], **dict(zip(self.fields, r[1:]))) for r in rows]
-    
+
     def get_all_like(self, like: dict[str, str]) -> list[T]:
         values = [f"%{v}%" for v in like.values()]
         where = dict(zip(like.keys(), values))

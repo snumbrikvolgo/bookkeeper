@@ -27,6 +27,7 @@ class AbstractRepository(ABC, Generic[T]):
     add
     get
     get_all
+    get_all_like
     update
     delete
     """
@@ -43,7 +44,8 @@ class AbstractRepository(ABC, Generic[T]):
         """ Получить объект по id """
 
     @abstractmethod
-    def get_all(self, where: dict[str, Any] | None = None, operator="=") -> list[T]:
+    def get_all(self, where: dict[str, Any] | None = None,
+                operator: str = "=") -> list[T]:
         """
         Получить все записи по некоторому условию
         where - условие в виде словаря {'название_поля': значение}
@@ -54,7 +56,7 @@ class AbstractRepository(ABC, Generic[T]):
         """
         Получить все записи по некоторому условию
         like - условие в виде словаря {'название_поля': значение},
-        где значение имеет тип строки и для выполнения условия должно 
+        где значение имеет тип строки и для выполнения условия должно
         содержаться внутри реального значения поля
         """
     @abstractmethod
