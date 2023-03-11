@@ -139,6 +139,15 @@ def test_delete_one(repo, custom_class):
     repo.delete(obj.pk)
     assert repo.get_all() == []
 
+def test_delete_no_pk(repo, custom_class):
+    objects1 = [custom_class(f1=int(i)) for i in range(5)]
+    for o in objects1:
+        repo.add(o)
+    assert repo.get_all() == objects1
+
+    obj_del = custom_class(pk=10)
+    with pytest.raises(ValueError):
+        repo.delete(obj_del.pk)
 
 def test_delete_middle(repo, custom_class):
     objects1 = [custom_class(f1=int(i)) for i in range(5)]
@@ -160,3 +169,14 @@ def test_crud(repo, custom_class):
     assert repo.get(pk) == obj2
     repo.delete(pk)
     assert repo.get(pk) is None
+
+def test_get_all_like(repo, custom_class):
+    objects = []
+    for i in range(5):
+        o = custom_class(f1=1)
+        o.f1 = "__" + str(i) + "__"
+        o.f2 = 'test'
+        repo.add(o)
+        objects.append(o)
+    assert [objects[0]] == repo.get_all_like({'f1': '0'})
+    assert objects == repo.get_all_like({'f2': 'test'})

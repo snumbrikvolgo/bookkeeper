@@ -72,6 +72,11 @@ class SQLiteRepository(AbstractRepository[T]):
                 ).fetchall()
         con.close()
         return [self.cls(pk=r[0], **dict(zip(self.fields, r[1:]))) for r in rows]
+    
+    def get_all_like(self, like: dict[str, str]) -> list[T]:
+        values = [f"%{v}%" for v in like.values()]
+        where = dict(zip(like.keys(), values))
+        return self.get_all(where=where, operator='LIKE')
 
     def update(self, obj: T) -> None:
         fields = ", ".join([f"{x}=?" for x in self.fields.keys()])

@@ -24,6 +24,12 @@ cats = '''
 '''.splitlines()
 
 Category.create_from_tree(read_tree(cats), cat_repo)
+budget = Budget(period="day", limitation=1000, spent=0)
+bud_repo.add(budget)
+budget = Budget(period="week", limitation=7000, spent=0)
+bud_repo.add(budget)
+budget = Budget(period="month", limitation=30000, spent=0)
+bud_repo.add(budget)
 
 while True:
     try:
@@ -50,6 +56,9 @@ while True:
             exp = Expense(int(names[0]), cat.pk)
             exp_repo.add(exp)
             print(exp)
+            for budget in bud_repo.get_all():
+                budget.update_spent(exp_repo)
+                bud_repo.update(budget)
         else:
             try:
                 cat = cat_repo.get_all({'name': names[1]})[0]

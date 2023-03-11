@@ -42,7 +42,7 @@ poetry install
 Для запуска тестов и статических анализаторов используйте следующие команды (убедитесь, 
 что вы находитесь в корневой папке проекта):
 ```commandline
-poetry run pytest --cov
+poetry run pytest --cov-report term-missing --cov=bookkeeper tests/
 poetry run mypy --strict bookkeeper
 poetry run pylint bookkeeper
 poetry run flake8 bookkeeper
