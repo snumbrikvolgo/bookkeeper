@@ -37,6 +37,8 @@ class Bookkeeper:
         self.view.register_exp_modifier(self.modify_exp)
         self.view.register_exp_deleter(self.delete_exp)
 
+        self.view.register_bdg_modifier(self.modify_bdg)
+
     def run(self):
         self.view.show_main_window()
     
@@ -84,7 +86,8 @@ class Bookkeeper:
         self.expenses_rep.add(exp)
         self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
-        
+        self.update_budgets()
+
     def modify_exp(self, pk, attr, value, old_val):
         print(pk, attr, value, old_val)
         exp = self.expenses_rep.get(pk)
@@ -119,11 +122,44 @@ class Bookkeeper:
         self.expenses_rep.update(exp)
         self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
+        self.update_budgets()
 
     def delete_exp(self, exps_pk: list[int]):
         for pk in exps_pk:
             self.expenses_rep.delete(pk)
         self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
+        self.update_budgets()
 
+    def update_budgets(self):
+        for budget in self.budget_rep.get_all():
+            budget.update_spent(self.expenses_rep)
+            self.budget_rep.update(budget)
+        self.budgets = self.budget_rep.get_all()
+        self.view.set_budget_list(self.budgets)
+
+    def modify_bdg(self, pk: int | None, new_limit: str, period: str):
+        if new_limit == "":
+            if pk is not None:
+                self.budget_rep.delete(pk)
+            self.update_budgets()
+            return
+        try:
+            new_limit = int(new_limit)
+        except ValueError:
+            self.update_budgets()
+            raise ValueError(f'Стоимость покупки должна быть'\
+                             +'целым положительным числом')
+        if new_limit < 0:
+            self.update_budgets()
+            raise ValueError(f'Стоимость покупки должна быть'\
+                             +'целым положительным числом')
+        if pk is None:
+            budget = Budget(limitation=new_limit, period=period)
+            self.budget_rep.add(budget)
+        else:
+            budget = self.budget_rep.get(pk)
+            budget.limitation = new_limit
+            self.budget_rep.update(budget)
+        self.update_budgets()
 

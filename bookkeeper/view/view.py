@@ -38,7 +38,8 @@ class AbstractView(Protocol):
     def register_exp_deleter(handler: Callable[[Expense], None]):
         pass
 
-
+    def register_bdg_modifier(handler: Callable[[Budget], None]):
+        pass
 
 def handle_error(widget, handler):
     def inner(*args, **kwargs):
@@ -65,7 +66,7 @@ class View:
         #self.app.setQuitOnLastWindowClosed(False)
         self.app.setStyle("Fusion")
         self.category_edit_window()
-        self.budget_table = BudgetTable(self.budget)
+        self.budget_table = BudgetTable(self.budget, self.modify_budget)
         self.new_expense = NewExpense(self.categories,\
                                        self.show_category_edit_window,
                                        self.add_expense,\
@@ -126,6 +127,9 @@ class View:
     def register_exp_deleter(self, handler):
         self.exp_deleter = handle_error(self.main_window, handler)
 
+    def register_bdg_modifier(self, handler):
+        self.bdg_modifier = handle_error(self.main_window, handler)
+
     def add_category(self, name, parent):
         self.cat_adder(name, parent)
         # try:
@@ -161,4 +165,7 @@ class View:
                     'Вы уверены, что хотите удалить все выбранные траты?')
             if reply == QtWidgets.QMessageBox.Yes:
                 self.exp_deleter(exps_pk)
+
+    def modify_budget(self, pk: int | None, new_limit: str, period: str):
+        self.bdg_modifier(pk, new_limit, period)
 

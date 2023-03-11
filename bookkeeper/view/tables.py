@@ -4,47 +4,23 @@ from bookkeeper.view.labels import GroupLabelCenter
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
 
-class AnyTableWidget(QtWidgets.QTableWidget):
-    def __init__(self, h_header_str:str="", v_header_str:str="", row_count:int=5, *args, **kwargs):
+class ExpensesTableWidget(QtWidgets.QTableWidget):
+    def __init__(self, h_header_str:str="", row_count:int=50, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if h_header_str != "":
-            hheaders = h_header_str.split()
-            self.setColumnCount(len(hheaders))
-            self.setRowCount(row_count)
-            self.setHorizontalHeaderLabels(hheaders)
-        if v_header_str != "":
-            vheaders = v_header_str.split()
-            self.setVerticalHeaderLabels(vheaders)
-        if h_header_str != "" and v_header_str != "":
-            for h in [self.horizontalHeader(), self.verticalHeader(),]:
-                h.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        else:
-            header = self.horizontalHeader()
-            print(row_count, hheaders)
-            for i in range(len(hheaders)):
-                if i == len(hheaders)-1:
-                    header.setSectionResizeMode(
-                    i, QtWidgets.QHeaderView.Stretch)
-                else: 
-                    header.setSectionResizeMode(
-                    i, QtWidgets.QHeaderView.ResizeToContents)    
-        self.setEditTriggers(
-            QtWidgets.QAbstractItemView.DoubleClicked)
-        self.cellDoubleClicked.connect(self.double_click)
-
-        self.verticalHeader().hide()
-
-    def double_click(self, row, columns):
-        pass
-
-    def set_data(self, data: list[list[str]]):
-        self.data = data
-        for i, row in enumerate(data):
-            for j, x in enumerate(row[:-1]):
-                self.setItem(
-                    i, j,
-                    QtWidgets.QTableWidgetItem(x)
-                )
+        self.setColumnCount(4)
+        self.setRowCount(row_count)
+        self.headers = h_header_str.split()
+        self.col_to_attr = {0:"expense_date", 1:"amount", 2:"category", 3:"comment"}
+        self.setHorizontalHeaderLabels(self.headers)
+        header = self.horizontalHeader()
+        header.setSectionResizeMode(
+            0, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(
+            3, QtWidgets.QHeaderView.Stretch)
 
 class ExpensesTable(QtWidgets.QGroupBox):
 
@@ -53,7 +29,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
         self.vbox = QtWidgets.QVBoxLayout()
         self.label = GroupLabelCenter("<b>Последние расходы</b>")
         self.vbox.addWidget(self.label)
-        self.table = AnyTableWidget(h_header_str="Дата Сумма Категория Комментарий",\
+        self.table = ExpensesTableWidget(h_header_str="Дата Сумма Категория Комментарий",\
                                      row_count=30)
         
         self.col_to_attr = {0:"expense_date", 1:"amount", 2:"category", 3:"comment"}
@@ -81,6 +57,15 @@ class ExpensesTable(QtWidgets.QGroupBox):
         self.vbox.addWidget(scroll)
         self.setLayout(self.vbox)
 
+    def set_data(self, data: list[list[str]]):
+        self.table.data = data
+        for i, row in enumerate(data):
+            for j, x in enumerate(row[:-1]):
+                self.table.setItem(
+                    i, j,
+                    QtWidgets.QTableWidgetItem(x)
+                )
+
     def set_expenses(self, exps: list[Expense]):
         self.expenses = exps
         self.expenses.sort(key=lambda x: x.expense_date, reverse=True)
@@ -90,7 +75,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
                           str(exp.category), str(exp.comment), exp.pk
                         ])
         self.table.clearContents()
-        self.table.set_data(data)
+        self.set_data(data)
 
     def double_click(self, row, columns):
         self.table.cellChanged.connect(self.modify_exp)
@@ -121,29 +106,76 @@ class ExpensesTable(QtWidgets.QGroupBox):
             start = ch_range.topRow()
             end = min(ch_range.bottomRow(), len(self.table.data))
             pks_to_del += [i[-1] for i in self.table.data[start:end+1]]
-        print(pks_to_del)
         self.exp_deleter(pks_to_del)
 
-class BudgetTable(QtWidgets.QGroupBox):
-    data = [['День','1000', '999', '1'],
-            ['Месяц','7000', '6999', '1'],
-            ['Неделя','30000', '29999', '1'],]
-    
-    def __init__(self, budget:list[Budget], *args, **kwargs):
+class BudgetTableWidget(QtWidgets.QTableWidget):
+    def __init__(self, h_header_str:str="", v_header_str:str="", row_count:int=3, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setColumnCount(3)
+        self.setRowCount(row_count)
+        self.row_to_period = {0:"day", 1:"week", 2:"month"}
+        hheaders = h_header_str.split()
+        self.setHorizontalHeaderLabels(hheaders)
+        vheaders = v_header_str.split()
+        self.setVerticalHeaderLabels(vheaders)
+        for h in [self.horizontalHeader(), self.verticalHeader(),]:
+            h.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)   
+
+class BudgetTable(QtWidgets.QGroupBox):
+    def __init__(self, budget:list[Budget], bdg_modifier, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bdg_modifier = bdg_modifier
         self.vbox = QtWidgets.QVBoxLayout()
         self.label = GroupLabelCenter("<b>Бюджет</b>")
         self.vbox.addWidget(self.label)
         self.budget=budget
-        self.table = AnyTableWidget(h_header_str="Период Бюджет Потрачено Остаток",\
+        self.table = BudgetTableWidget(h_header_str="Бюджет Потрачено Остаток",\
                                     v_header_str="День Неделя Месяц",\
                                     row_count=3)
-        self.table.set_data(self.data)
+        self.row_to_period = {0:"day", 1:"week", 2:"month"}
+
+        self.table.setEditTriggers(
+        QtWidgets.QAbstractItemView.DoubleClicked)
+        self.table.cellDoubleClicked.connect(self.double_click)
+
         self.vbox.addWidget(self.table)
         self.setLayout(self.vbox)
 
     def set_budget(self, budget: list[Budget]):
         self.budget = budget
+        data = []
+        for period in ["day", "week", "month"]:
+            bdg = [b for b in budget if b.period == period]
+            if len(bdg) == 0:
+                data.append(["Не установлен", "", "", None])
+            else:
+                b = bdg[0]
+                data.append([str(b.limitation), str(b.spent),
+                            str(int(b.limitation) - int(b.spent)), b.pk])
+        self.table.clearContents()
+        self.set_data(data)
 
+    def set_data(self, data: list[list[str]]):
+        self.table.data = data
+        for i, row in enumerate(data):
+            for j, x in enumerate(row[:-1]):
+                self.table.setItem(
+                    i, j,
+                    QtWidgets.QTableWidgetItem(x.capitalize())
+                )
+                self.table.item(i, j).setTextAlignment(Qt.AlignCenter)
+                if j == 0:
+                    self.table.item(i, j).setFlags(Qt.ItemIsEditable 
+                                             | Qt.ItemIsEnabled 
+                                             | Qt.ItemIsSelectable)
+                else: 
+                    self.table.item(i, j).setFlags(Qt.ItemIsEnabled)
 
-        
+    def modify_bdg(self, row, column):
+        self.table.cellChanged.disconnect(self.modify_bdg)
+        pk = self.table.data[row][-1]
+        new_limit = self.table.item(row, column).text()
+        self.bdg_modifier(pk, new_limit, self.row_to_period[row])
+
+    def double_click(self, row, columns):
+        self.table.cellChanged.connect(self.modify_bdg)

@@ -57,11 +57,11 @@ class SQLiteRepository(AbstractRepository[T]):
             return obj
         return None
 
-    def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
+    def get_all(self, where: dict[str, Any] | None = None, operator="=") -> list[T]:
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             if where:
-                fields = " AND ".join([f"{k}={repr(v)}" for k, v in where.items()])
+                fields = " AND ".join([f"{k} {operator} {repr(v)}" for k, v in where.items()])
                 rows = cur.execute(
                     f'SELECT ROWID, * FROM {self.table_name} '
                     + f'WHERE {fields}'
