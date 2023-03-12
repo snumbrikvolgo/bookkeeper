@@ -1,50 +1,87 @@
+"""
+Классы текстовых полей
+"""
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
+# pylint: disable = no-name-in-module
+# pylint: disable=c-extension-no-member
+# pylint: disable=too-few-public-methods
+
 
 class LabeledLineInput(QtWidgets.QWidget):
-    def __init__(self, text, placeholder, *args, **kwargs):
+    """
+    Поле для линейного ввода
+    """
+    def __init__(self, text: str, placeholder: str, *args, **kwargs):  # type: ignore
         super().__init__(*args, **kwargs)
         self.placeholder = placeholder
-        self.layout = QtWidgets.QHBoxLayout()
+        self.layout = QtWidgets.QHBoxLayout()  # type: ignore
         self.label = QtWidgets.QLabel(text)
-        self.layout.addWidget(self.label, stretch=1)
+        self.layout.addWidget(self.label, stretch=1)  # type: ignore
         self.input = QtWidgets.QLineEdit(self.placeholder)
-        self.layout.addWidget(self.input, stretch=5)
-        self.setLayout(self.layout)
+        self.layout.addWidget(self.input, stretch=5)  # type: ignore
+        self.setLayout(self.layout)  # type: ignore
 
-    def clear(self):
+    def clear(self) -> None:
+        """
+        Очистить
+        """
         self.input.setText(self.placeholder)
+
     def set_text(self, text: str) -> None:
-            self.input.setText(text)
-    def text(self):
+        """
+        Установить текст
+        """
+        self.input.setText(text)
+
+    def text(self) -> str:
+        """
+        Вернуть текст
+        """
         return self.input.text()
 
+
 class LabeledComboBoxInput(QtWidgets.QWidget):
-    def __init__(self, text: str, items: list[str], *args, **kwargs):
+    """
+    Класс выдвигающегося списка
+    """
+    def __init__(self, text: str, items: list[str], *args, **kwargs):  # type: ignore
         super().__init__(*args, **kwargs)
-        self.layout = QtWidgets.QHBoxLayout()
+        self.layout = QtWidgets.QHBoxLayout()  # type: ignore
         self.label = QtWidgets.QLabel(text)
-        self.layout.addWidget(self.label, stretch=1)
+        self.layout.addWidget(self.label, stretch=1)  # type: ignore
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.setEditable(True)
-        self.combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)  # type: ignore # noqa
         self.combo_box.setMaxVisibleItems(16)
         self.set_items(items)
         self.combo_box.setEditable(False)
-        self.layout.addWidget(self.combo_box, stretch=5)
+        self.layout.addWidget(self.combo_box, stretch=5)  # type: ignore
 
-        self.setLayout(self.layout)
+        self.setLayout(self.layout)  # type: ignore
 
-    def clear(self):
+    def clear(self) -> None:
+        """
+        Очистить
+        """
         self.combo_box.setCurrentText(self.combo_box.placeholderText())
 
-    def text(self):
+    def text(self) -> str:
+        """
+        Вернуть текст
+        """
         return self.combo_box.currentText()
-    
+
     def set_text(self, text: str) -> None:
+        """
+        Установить текст
+        """
         self.combo_box.setCurrentText(text)
 
-    def set_items(self, items: list[str]):
+    def set_items(self, items: list[str]) -> None:
+        """
+        Установить поля в выдвигающемся списке
+        """
         self.items = items
         self.combo_box.clear()
         self.combo_box.addItems(items)
@@ -53,8 +90,12 @@ class LabeledComboBoxInput(QtWidgets.QWidget):
         else:
             self.combo_box.setPlaceholderText("")
         self.clear()
-        
+
+
 class GroupLabelCenter(QtWidgets.QLabel):
-    def __init__(self, text, *args, **kwargs):
+    """
+    Поставить по центру надпись
+    """
+    def __init__(self, text: str, *args, **kwargs):  # type: ignore
         super().__init__(text, *args, **kwargs)
-        self.setAlignment(Qt.AlignCenter)
+        self.setAlignment(Qt.AlignCenter)  # type: ignore
