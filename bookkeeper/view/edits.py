@@ -3,7 +3,8 @@
 """
 from collections.abc import Callable
 from PySide6 import QtWidgets
-from bookkeeper.view.labels import GroupLabelCenter, LabeledComboBoxInput, LabeledLineInput
+from bookkeeper.view.labels import GroupLabelCenter, LabeledComboBoxInput
+from bookkeeper.view.labels import LabeledLineInput
 from bookkeeper.models.category import Category
 # pylint: disable = no-name-in-module
 # # pylint: disable=c-extension-no-member
@@ -99,13 +100,14 @@ class CategoryEditWindow(QtWidgets.QWidget):
             self.cat_adder(self.cat_add_name.text(), None)  # type: ignore
             print(f"Категория '{self.cat_add_name.text()}' добавлена")
         else:
-            self.cat_adder(self.cat_add_name.text(), self.cat_add_parent.text())  # type: ignore
+            self.cat_adder(self.cat_add_name.text(), self.cat_add_parent.text())  # type: ignore # noqa
             print(f"Подкатегория '{self.cat_add_name.text()}' категории "
                   + f"'{self.cat_add_parent.text()}' добавлена")
         self.cat_add_name.clear()
         self.cat_add_parent.clear()
 
-    def find_children(self, parent_pk: int | None = None) -> list[QtWidgets.QTreeWidgetItem]:
+    def find_children(self,
+                      parent_pk: int | None = None) -> list[QtWidgets.QTreeWidgetItem]:
         """
         Найти дочерние подкатегории
         """
@@ -117,12 +119,14 @@ class CategoryEditWindow(QtWidgets.QWidget):
             items.append(item)
         return items
 
+
 class NewExpense(QtWidgets.QGroupBox):
     """
     Виджет добавление расхода и категории
     """
     def __init__(self, cats: list[Category],  # type: ignore
-                 show_category_edit_window: Callable[[], None], exp_adder: Callable[[], None],
+                 show_category_edit_window: Callable[[], None],
+                 exp_adder: Callable[[], None],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.categories = cats
@@ -132,24 +136,24 @@ class NewExpense(QtWidgets.QGroupBox):
 
         self.grid = QtWidgets.QGridLayout()
         self.label = GroupLabelCenter("<b>Новая трата</b>")
-        self.grid.addWidget(self.label,0,0,1,5)
+        self.grid.addWidget(self.label, 0, 0, 1, 5)
 
         self.amount_input = LabeledLineInput("Сумма", "0")
-        self.grid.addWidget(self.amount_input,1,0,1,2)
+        self.grid.addWidget(self.amount_input, 1, 0, 1, 2)
 
         self.comment_input = LabeledLineInput("Комментарий", "")
-        self.grid.addWidget(self.comment_input,2,0,1,5)
+        self.grid.addWidget(self.comment_input, 2, 0, 1, 5)
 
         self.category_input = LabeledComboBoxInput("Категория", self.cat_names)
-        self.grid.addWidget(self.category_input,3,0,1,2)
+        self.grid.addWidget(self.category_input, 3, 0, 1, 2)
 
         self.cats_edit_button = QtWidgets.QPushButton('Редактировать')
-        self.cats_edit_button.clicked.connect(self.show_category_edit_window)  # type: ignore
-        self.grid.addWidget(self.cats_edit_button,3,2,1,3)
+        self.cats_edit_button.clicked.connect(self.show_category_edit_window)  # type: ignore # noqa
+        self.grid.addWidget(self.cats_edit_button, 3, 2, 1, 3)
 
         self.submit_button = QtWidgets.QPushButton('Добавить')
         self.submit_button.clicked.connect(self.submit)  # type: ignore
-        self.grid.addWidget(self.submit_button,4,0,1,5)
+        self.grid.addWidget(self.submit_button, 4, 0, 1, 5)
         self.setLayout(self.grid)
 
     def submit(self) -> None:
@@ -159,7 +163,7 @@ class NewExpense(QtWidgets.QGroupBox):
         self.exp_adder(self.amount_input.text(),  # type: ignore
                        self.category_input.text(),
                        self.comment_input.text())
-        print(f"Новая трата в категории {self.category_input.text()}"+\
+        print(f"Новая трата в категории {self.category_input.text()}" +
               " на сумму {self.amount_input.text()} добавлена")
         self.amount_input.clear()
         self.category_input.clear()

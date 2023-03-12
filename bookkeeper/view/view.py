@@ -36,7 +36,7 @@ class AbstractView(Protocol):
         """
         Отображение бюджета
         """
-    def register_cat_adder(self, handler: Callable[[Category], None]) -> None:
+    def register_cat_adder(self, handler: Callable[[Any], None]) -> None:
         """
         Присоединение презентера
         """

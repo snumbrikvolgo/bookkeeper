@@ -1,7 +1,6 @@
 """
 Описан класс, представляющий расходную операцию
 """
-
 from dataclasses import dataclass
 from datetime import datetime
 
