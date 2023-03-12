@@ -141,7 +141,7 @@ class NewExpense(QtWidgets.QGroupBox):
         self.grid.addWidget(self.label, 0, 0, 1, 5)
 
         self.amount_input = LabeledLineInput("Сумма", "0")
-        self.grid.addWidget(self.amount_input, 1, 0, 1, 2)
+        self.grid.addWidget(self.amount_input, 1, 0, 1, 5)
 
         self.comment_input = LabeledLineInput("Комментарий", "")
         self.grid.addWidget(self.comment_input, 2, 0, 1, 5)

@@ -30,6 +30,7 @@ class ExpensesTableWidget(QtWidgets.QTableWidget):
         self.col_to_attr = {0: "expense_date", 1: "amount",
                             2: "category", 3: "comment"}
         self.setHorizontalHeaderLabels(self.headers)
+
         header = self.horizontalHeader()
         header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.ResizeToContents)  # type: ignore

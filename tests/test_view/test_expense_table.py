@@ -23,7 +23,7 @@ def test_add_data(qtbot):
             assert widget.table.item(i, j).text() == test_data[i][j]
 
 def test_cell_changed(qtbot):
-    def exp_modifier(pk, attr, new_val, old_val):
+    def exp_modifier(pk, attr, new_val):
         exp_modifier.was_called = True
         assert pk == test_data[0][4]
         assert new_val == test_data[0][0]

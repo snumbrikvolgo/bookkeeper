@@ -31,7 +31,7 @@ bud_repo.add(budget)
 budget = Budget(period="month", limitation=30000, spent=0)
 bud_repo.add(budget)
 
-while True:
+while True:  # noqa
     try:
         cmd = input('$> ')
     except EOFError:
