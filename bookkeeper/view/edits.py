@@ -80,8 +80,9 @@ class CategoryEditWindow(QtWidgets.QWidget):
         self.cats_tree.clear()
         self.cats_tree.insertTopLevelItems(0, top_items)
         self.cat_del.set_items(self.cat_names)
-        self.cat_names.append("Нет в списке")
-        self.cat_add_parent.set_items(self.cat_names)
+        self.cat_names_more = self.cat_names.copy()
+        self.cat_names_more.append("Нет в списке")
+        self.cat_add_parent.set_items(self.cat_names_more)
 
     def delete_category(self) -> None:
         """

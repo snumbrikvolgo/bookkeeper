@@ -67,10 +67,6 @@ class ExpensesTable(QtWidgets.QGroupBox):
         self.exp_del_button.clicked.connect(self.delete_exp)  # type: ignore
         self.vbox.addWidget(self.exp_del_button)
 
-        self.exp_mod_button = QtWidgets.QPushButton('Изменить')
-        self.exp_mod_button.clicked.connect(self.modify_button)  # type: ignore
-        self.vbox.addWidget(self.exp_mod_button)
-
         self.table.setEditTriggers(
             QtWidgets.QAbstractItemView.DoubleClicked)  # type: ignore
         self.table.cellDoubleClicked.connect(self.double_click)  # type: ignore
@@ -97,7 +93,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
         Занос данных в таблицу расходов из репозитория
         """
         self.expenses = exps
-        self.expenses.sort(key=lambda x: x.expense_date, reverse=True)
+        # self.expenses.sort(key=lambda x: x.expense_date, reverse=True)
         data = []
         for exp in exps:
             data.append([exp.expense_date, str(exp.amount),
@@ -110,23 +106,6 @@ class ExpensesTable(QtWidgets.QGroupBox):
         Реакция на двойное нажатие
         """
         self.table.cellChanged.connect(self.modify_exp)  # type: ignore
-
-    def modify_button(self) -> None:
-        """
-        Реакция на нажатие на кнопку
-        """
-        self.table.cellClicked.connect(self.modify_exp_button)  # type: ignore
-
-    def modify_exp_button(self, row: int, column: int) -> None:
-        """
-        Изменение при нажатии на кнопку
-        """
-        old_val = self.table.item(row, column).text()
-        self.table.cellClicked.disconnect(self.modify_exp_button)  # type: ignore
-        pk = self.table.data[row][-1]
-        new_val = self.table.item(row, column).text()
-        attr = self.col_to_attr[column]
-        self.exp_modifier(pk, attr, new_val, old_val)  # type: ignore
 
     def modify_exp(self, row: int, column: int) -> None:
         """

@@ -39,8 +39,8 @@ class SQLiteRepository(AbstractRepository[T]):
             )
             if cur.lastrowid is not None:
                 obj.pk = cur.lastrowid
-            else:
-                raise ValueError(f'Unable to add {obj}')
+            # else:
+            #     raise ValueError(f'Unable to add {obj}')
         con.close()
         return obj.pk
 
