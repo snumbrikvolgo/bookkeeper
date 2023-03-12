@@ -15,6 +15,7 @@ from bookkeeper.view.edits import NewExpense
 from bookkeeper.view.tables import ExpensesTable, BudgetTable
 from bookkeeper.view.edits import CategoryEditWindow
 
+
 class AbstractView(Protocol):
     """
     Абстрактный интерфейс, позволяющий соединять модели и презентера
@@ -23,11 +24,11 @@ class AbstractView(Protocol):
         """
         Показ виджета главного окна
         """
-    def set_category_list(self, cats : list[Category]) -> None:
+    def set_category_list(self, cats: list[Category]) -> None:
         """
         Отображение категорий
         """
-    def set_expenses_list(self, exps : list[Expense]) -> None:
+    def set_expenses_list(self, exps: list[Expense]) -> None:
         """
         Отображение расходов
         """
@@ -64,7 +65,9 @@ class AbstractView(Protocol):
         Присоединение презентера
         """
 
-def handle_error(widget: QtWidgets.QWidget, handler: Callable[[], None]) -> Callable[[], None]:
+
+def handle_error(widget: QtWidgets.QWidget,
+                 handler: Callable[[], None]) -> Callable[[], None]:
     """
     Показ ошибки в случае ошибки
     """
@@ -74,6 +77,7 @@ def handle_error(widget: QtWidgets.QWidget, handler: Callable[[], None]) -> Call
         except ValueError as exeption:
             QtWidgets.QMessageBox.critical(widget, 'Ошибка', str(exeption))
     return inner
+
 
 class View:
     """
@@ -98,18 +102,17 @@ class View:
 
     def __init__(self) -> None:
         self.app = QtWidgets.QApplication(sys.argv)
-        #self.app.setQuitOnLastWindowClosed(False)
+        # self.app.setQuitOnLastWindowClosed(False)
         self.app.setStyle("Fusion")
         self.category_edit_window()
         self.budget_table = BudgetTable(self.budget, self.modify_budget)
-        self.new_expense = NewExpense(self.categories,\
-                                       self.show_category_edit_window,
-                                       self.add_expense,\
-                                    )
+        self.new_expense = NewExpense(self.categories,
+                                      self.show_category_edit_window,
+                                      self.add_expense)
         self.expenses_table = ExpensesTable(self.expenses, self.delete_expense,
                                             self.modify_expense)
         self.main_window = MainWindow(self.budget_table,
-                                    self.new_expense,
+                                      self.new_expense,
                                       self.expenses_table)
         self.main_window.resize(800, 800)
 
@@ -127,9 +130,9 @@ class View:
         Создание окна редактирования категорий
         """
         self.cats_edit_window = CategoryEditWindow(self.categories,
-                                                     self.add_category,
-                                                     self.delete_category,
-                                                     self.modify_category)
+                                                   self.add_category,
+                                                   self.delete_category,
+                                                   self.modify_category)
         self.cats_edit_window.setWindowTitle("Редактирование категорий")
         self.cats_edit_window.resize(600, 600)
 
@@ -208,7 +211,7 @@ class View:
         """
         Вызов у презентера
         """
-        self.cat_adder(name, parent) # type: ignore
+        self.cat_adder(name, parent)  # type: ignore
 
         # try:
         #     self.cat_adder(name, parent)
@@ -218,49 +221,45 @@ class View:
         """
         Вызов у презентера
         """
-        self.cat_modifier(cat) # type: ignore
+        self.cat_modifier(cat)  # type: ignore
 
     def delete_category(self, name: str) -> None:
         """
         Вызов у презентера
         """
         cat = [c for c in self.categories if c.name == name][0]
-        reply = QtWidgets.QMessageBox.question(self.main_window,
-                'Удаление категории',
-                'Вы уверены, что хотите удалить категорию?')
-        if reply == QtWidgets.QMessageBox.Yes: # type: ignore
-            self.cat_deleter(cat) # type: ignore
+        reply = QtWidgets.QMessageBox.question(self.main_window, 'Удаление категории',
+                'Вы уверены, что хотите удалить категорию?')  # noqa: E128
+        if reply == QtWidgets.QMessageBox.Yes:  # type: ignore
+            self.cat_deleter(cat)  # type: ignore
 
     def add_expense(self, amount: str, category: str, comment: str) -> None:
         """
         Вызов у презентера
         """
-        self.exp_adder(amount, category, comment) # type: ignore
+        self.exp_adder(amount, category, comment)  # type: ignore
 
     def modify_expense(self, pk: int, attr: str, value: str, old_val: str) -> None:
         """
         Вызов у презентера
         """
-        self.exp_modifier(pk, attr, value, old_val) # type: ignore
+        self.exp_modifier(pk, attr, value, old_val)  # type: ignore
 
     def delete_expense(self, exps_pk: list[int]) -> None:
         """
         Вызов у презентера
         """
-        # self.exp_deleter(exps_pk)
         if len(exps_pk) == 0:
-            QtWidgets.QMessageBox.critical(self.main_window,
-                            'Ошибка',
-                            'Траты для удаления не выбраны.')
+            QtWidgets.QMessageBox.critical(self.main_window, 'Ошибка',
+                                           'Траты для удаления не выбраны.')
         else:
-            reply = QtWidgets.QMessageBox.question(self.main_window,
-                    'Удаление трат',
-                    'Вы уверены, что хотите удалить все выбранные траты?')
-            if reply == QtWidgets.QMessageBox.Yes: # type: ignore
-                self.exp_deleter(exps_pk) # type: ignore
+            reply = QtWidgets.QMessageBox.question(self.main_window, 'Удаление трат',
+                    'Вы уверены, что хотите удалить все выбранные траты?')  # noqa: E128
+            if reply == QtWidgets.QMessageBox.Yes:  # type: ignore
+                self.exp_deleter(exps_pk)  # type: ignore
 
     def modify_budget(self, pk: int | None, new_limit: str, period: str) -> None:
         """
         Вызов у презентера
         """
-        self.bdg_modifier(pk, new_limit, period) # type: ignore
+        self.bdg_modifier(pk, new_limit, period)  # type: ignore

@@ -1,13 +1,21 @@
+"""
+Виджет главного окна
+"""
 from PySide6 import QtWidgets
 from bookkeeper.view.tables import ExpensesTable, BudgetTable
 from bookkeeper.view.edits import NewExpense
+# pylint: disable=too-few-public-methods
+# pylint: disable=c-extension-no-member)
 
 
 class MainWindow(QtWidgets.QWidget):
-    def __init__(self, budget_table: BudgetTable,
-                       new_expense: NewExpense,
-                       expenses_table: ExpensesTable,
-                       *args, **kwargs):
+    """
+    Класс виджета главного окна
+    """
+    def __init__(self, budget_table: BudgetTable,  # type: ignore
+                 new_expense: NewExpense,
+                 expenses_table: ExpensesTable,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.vbox = QtWidgets.QVBoxLayout()
         self.setWindowTitle("The Bookkeeper App")
