@@ -5,7 +5,7 @@ from PySide6 import QtWidgets
 from bookkeeper.view.tables import ExpensesTable, BudgetTable
 from bookkeeper.view.edits import NewExpense
 # pylint: disable=too-few-public-methods
-# pylint: disable=c-extension-no-member)
+# pylint: disable=c-extension-no-member
 
 
 class MainWindow(QtWidgets.QWidget):
