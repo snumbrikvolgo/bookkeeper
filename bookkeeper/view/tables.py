@@ -103,7 +103,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
             data.append([exp.expense_date, str(exp.amount),
                          str(exp.category), str(exp.comment), exp.pk])
         self.table.clearContents()
-        self.set_data(data)
+        self.set_data(data)  # type: ignore
 
     def double_click(self) -> None:
         """
@@ -210,9 +210,9 @@ class BudgetTable(QtWidgets.QGroupBox):
             else:
                 b = bdg[0]
                 data.append([str(b.limitation), str(b.spent),
-                            str(int(b.limitation) - int(b.spent)), b.pk])
+                            str(int(b.limitation) - int(b.spent)), b.pk])  # type: ignore
         self.table.clearContents()
-        self.set_data(data)
+        self.set_data(data)  # type: ignore
 
     def set_data(self, data: list[list[str]]) -> None:
         """

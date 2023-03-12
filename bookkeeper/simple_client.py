@@ -65,6 +65,3 @@ while True:
             except IndexError:
                 print(f'категория {names[1]} не найдена')
                 continue
-            bud = Budget(int(names[0]), cat.pk, int(names[2]))
-            bud_repo.add(bud)
-            print(bud)

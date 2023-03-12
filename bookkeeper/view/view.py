@@ -36,31 +36,31 @@ class AbstractView(Protocol):
         """
         Отображение бюджета
         """
-    def register_cat_adder(self, handler: Callable[[Any], None]) -> None:
+    def register_cat_adder(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
-    def register_cat_modifier(self, handler: Callable[[Category], None]) -> None:
+    def register_cat_modifier(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
-    def register_cat_deleter(self, handler: Callable[[Category], None]) -> None:
+    def register_cat_deleter(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
-    def register_exp_adder(self, handler: Callable[[Expense], None]) -> None:
+    def register_exp_adder(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
-    def register_exp_modifier(self, handler: Callable[[Expense], None]) -> None:
+    def register_exp_modifier(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
-    def register_exp_deleter(self, handler: Callable[[Expense], None]) -> None:
+    def register_exp_deleter(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
-    def register_bdg_modifier(self, handler: Callable[[Budget], None]) -> None:
+    def register_bdg_modifier(self, handler: Callable[[], None]) -> None:
         """
         Присоединение презентера
         """
@@ -105,12 +105,13 @@ class View:
         # self.app.setQuitOnLastWindowClosed(False)
         self.app.setStyle("Fusion")
         self.category_edit_window()
-        self.budget_table = BudgetTable(self.budget, self.modify_budget)
+        self.budget_table = BudgetTable(self.budget, self.modify_budget)  # type: ignore
         self.new_expense = NewExpense(self.categories,
                                       self.show_category_edit_window,
-                                      self.add_expense)
-        self.expenses_table = ExpensesTable(self.expenses, self.delete_expense,
-                                            self.modify_expense)
+                                      self.add_expense)  # type: ignore
+        self.expenses_table = ExpensesTable(self.expenses,
+                                            self.delete_expense,  # type: ignore
+                                            self.modify_expense)  # type: ignore
         self.main_window = MainWindow(self.budget_table,
                                       self.new_expense,
                                       self.expenses_table)
@@ -130,9 +131,9 @@ class View:
         Создание окна редактирования категорий
         """
         self.cats_edit_window = CategoryEditWindow(self.categories,
-                                                   self.add_category,
-                                                   self.delete_category,
-                                                   self.modify_category)
+                                                   self.add_category,  # type: ignore
+                                                   self.delete_category,  # type: ignore
+                                                   self.modify_category)  # type: ignore
         self.cats_edit_window.setWindowTitle("Редактирование категорий")
         self.cats_edit_window.resize(600, 600)
 

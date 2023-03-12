@@ -35,8 +35,8 @@ class Bookkeeper:
         self.view.set_budget_list(self.budget)
 
         self.view.register_cat_adder(self.add_cat)  # type: ignore
-        self.view.register_cat_modifier(self.modify_cat)
-        self.view.register_cat_deleter(self.delete_cat)
+        self.view.register_cat_modifier(self.modify_cat)  # type: ignore
+        self.view.register_cat_deleter(self.delete_cat)  # type: ignore
 
         self.view.register_exp_adder(self.add_exp)  # type: ignore
         self.view.register_exp_modifier(self.modify_exp)  # type: ignore
