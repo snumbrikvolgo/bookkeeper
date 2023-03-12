@@ -29,7 +29,7 @@ class Bookkeeper:
         self.categories = self.category_rep.get_all()
         self.expenses = self.expenses_rep.get_all()
         self.budget = self.budget_rep.get_all()
-
+        self.update_budget()
         self.view.set_category_list(self.categories)
         self.view.set_expenses_list(self.expenses)
         self.view.set_budget_list(self.budget)
@@ -82,11 +82,11 @@ class Bookkeeper:
         """
         children = self.category_rep.get_all(where={'parent': cat.pk})
         self.category_rep.delete(cat.pk)
-        for exp in self.expenses_rep.get_all(where={'category': cat.name}):
+        for exp in self.expenses_rep.get_all(where={'category': cat.pk}):
             self.expenses_rep.delete(exp.pk)
         for child in children:
             self.category_rep.delete(child.pk)
-            for exp in self.expenses_rep.get_all(where={'category': child.name}):
+            for exp in self.expenses_rep.get_all(where={'category': child.pk}):
                 self.expenses_rep.delete(exp.pk)
         self.categories = self.category_rep.get_all()
         self.expenses = self.expenses_rep.get_all()
@@ -102,7 +102,7 @@ class Bookkeeper:
         if int_amount <= 0:
             raise ValueError('Стоимость покупки должна быть' +
                              'целым положительным числом')
-        cat = self.category_rep.get_all(where={"name": category})
+        cat = self.category_rep.get_all(where={"name": category})[0]
         exp = Expense(amount=int_amount, category=cat.pk, comment=comment)
         self.expenses_rep.add(exp)
         self.expenses = self.expenses_rep.get_all()
@@ -121,7 +121,8 @@ class Bookkeeper:
                 if value not in [c.name for c in self.categories]:
                     error_str = f'Категории {value} не существует'
                     raise ValueError(f'Категории {value} не существует')
-                value = self.category_rep.get_all(where={'name': value})[0].name
+                value_int = self.category_rep.get_all(where={'name': value})[0].pk
+                setattr(exp, attr, value_int)
             elif attr == "amount":
                 if int(value) <= 0:
                     error_str = 'Стоимость покупки должна быть' +\
@@ -129,19 +130,20 @@ class Bookkeeper:
 
                     raise ValueError('Стоимость покупки должна быть' +
                                      'целым положительным числом')
+                setattr(exp, attr, value)
             elif attr == "expense_date":
                 try:
                     value = datetime.fromisoformat(value).isoformat(
                                                 sep=' ', timespec='seconds')
-                except ValueError:
+                except ValueError as err:
                     error_str = 'Неправильный формат даты'
-                    raise ValueError(error_str)  # noqa
-            setattr(exp, attr, value)
-        except ValueError:
+                    raise ValueError(error_str) from err
+                setattr(exp, attr, value)
+        except ValueError as err:
             self.view.set_expenses_list(self.expenses)
-            raise ValueError(error_str)  # noqa
-        else:
-            setattr(exp, attr, old_val)
+            raise ValueError(error_str) from err
+        # else:
+        #     setattr(exp, attr, old_val)
         self.expenses_rep.update(exp)
         self.expenses = self.expenses_rep.get_all()
         self.view.set_expenses_list(self.expenses)
@@ -159,7 +161,7 @@ class Bookkeeper:
 
     def update_budget(self) -> None:
         """
-        Обновить бюджет по изменеии расходов
+        Обновить бюджет по изменении расходов или при изменении вне программы
         """
         for budget in self.budget_rep.get_all():
             budget.update_spent(self.expenses_rep)
@@ -178,10 +180,10 @@ class Bookkeeper:
             return
         try:
             new_limit_int = int(new_limit)
-        except ValueError:
+        except ValueError as err:
             self.update_budget()
-            raise ValueError('Стоимость покупки должна быть' +  # noqa: W0707
-                             ' целым положительным числом')
+            raise ValueError('Стоимость покупки должна быть' +
+                             ' целым положительным числом') from err
         if new_limit_int < 0:
             self.update_budget()
             raise ValueError('Стоимость покупки должна быть'

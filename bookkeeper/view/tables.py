@@ -1,6 +1,11 @@
 """
 Виджеты бюджета и расходов
 """
+# pylint: disable = no-name-in-module
+# pylint: disable=c-extension-no-member
+# pylint: disable=too-few-public-methods
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=invalid-name
 from collections.abc import Callable
 from typing import Any, List
 from PySide6 import QtWidgets
@@ -8,11 +13,7 @@ from PySide6.QtCore import Qt
 from bookkeeper.view.labels import GroupLabelCenter
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
-# pylint: disable = no-name-in-module
-# # pylint: disable=c-extension-no-member
-# pylint: disable=too-few-public-methods
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=invalid-name
+from bookkeeper.models.category import Category
 
 
 class ExpensesTableWidget(QtWidgets.QTableWidget):
@@ -47,7 +48,8 @@ class ExpensesTable(QtWidgets.QGroupBox):
     """
     def __init__(self, exps: list[Expense],  # type: ignore
                  exp_deleter: Callable[[], None],
-                 exp_modifier: Callable[[], None], *args, **kwargs):
+                 exp_modifier: Callable[[], None],
+                 catpk_to_name: Callable[[int], str], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.vbox = QtWidgets.QVBoxLayout()
         self.label = GroupLabelCenter("<b>Последние расходы</b>")
@@ -62,7 +64,7 @@ class ExpensesTable(QtWidgets.QGroupBox):
 
         self.exp_deleter = exp_deleter
         self.exp_modifier = exp_modifier
-
+        self.catpk_to_name = catpk_to_name
         self.exp_del_button = QtWidgets.QPushButton('Удалить')
         self.exp_del_button.clicked.connect(self.delete_exp)  # type: ignore
         self.vbox.addWidget(self.exp_del_button)
@@ -96,8 +98,9 @@ class ExpensesTable(QtWidgets.QGroupBox):
         # self.expenses.sort(key=lambda x: x.expense_date, reverse=True)
         data = []
         for exp in exps:
+            name = self.catpk_to_name(exp.category)
             data.append([exp.expense_date, str(exp.amount),
-                         str(exp.category), str(exp.comment), exp.pk])
+                         str(name), str(exp.comment), exp.pk])
         self.table.clearContents()
         self.set_data(data)  # type: ignore
 

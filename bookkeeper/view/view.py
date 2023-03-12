@@ -6,6 +6,7 @@ from typing import Protocol
 from collections.abc import Callable
 from PySide6 import QtWidgets
 # pylint: disable=too-many-instance-attributes
+# pylint: disable=c-extension-no-member
 
 from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
@@ -111,7 +112,8 @@ class View:
                                       self.add_expense)  # type: ignore
         self.expenses_table = ExpensesTable(self.expenses,
                                             self.delete_expense,  # type: ignore
-                                            self.modify_expense)  # type: ignore
+                                            self.modify_expense,  # type: ignore
+                                            self.catpk_to_name)  # type: ignore
         self.main_window = MainWindow(self.budget_table,
                                       self.new_expense,
                                       self.expenses_table)
@@ -264,3 +266,9 @@ class View:
         Вызов у презентера
         """
         self.bdg_modifier(pk, new_limit, period)  # type: ignore
+
+    def catpk_to_name(self, pk: int) -> str:
+        name = [c.name for c in self.categories if int(c.pk) == int(pk)]
+        if len(name):
+            return str(name[0])
+        return ""

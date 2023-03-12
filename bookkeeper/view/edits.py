@@ -101,7 +101,8 @@ class CategoryEditWindow(QtWidgets.QWidget):
             self.cat_adder(self.cat_add_name.text(), None)  # type: ignore
             print(f"Категория '{self.cat_add_name.text()}' добавлена")
         else:
-            self.cat_adder(self.cat_add_name.text(), self.cat_add_parent.text())  # type: ignore # noqa
+            self.cat_adder(self.cat_add_name.text(),  # type: ignore
+                           self.cat_add_parent.text())
             print(f"Подкатегория '{self.cat_add_name.text()}' категории "
                   + f"'{self.cat_add_parent.text()}' добавлена")
         self.cat_add_name.clear()
@@ -165,7 +166,7 @@ class NewExpense(QtWidgets.QGroupBox):
                        self.category_input.text(),
                        self.comment_input.text())
         print(f"Новая трата в категории {self.category_input.text()}" +
-              " на сумму {self.amount_input.text()} добавлена")
+              f" на сумму {self.amount_input.text()} добавлена")
         self.amount_input.clear()
         self.category_input.clear()
 

@@ -1,11 +1,11 @@
 """
 Классы текстовых полей
 """
-from PySide6 import QtWidgets
-from PySide6.QtCore import Qt
 # pylint: disable = no-name-in-module
 # pylint: disable=c-extension-no-member
 # pylint: disable=too-few-public-methods
+from PySide6 import QtWidgets
+from PySide6.QtCore import Qt
 
 
 class LabeledLineInput(QtWidgets.QWidget):
@@ -52,7 +52,8 @@ class LabeledComboBoxInput(QtWidgets.QWidget):
         self.layout.addWidget(self.label, stretch=1)  # type: ignore
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.setEditable(True)
-        self.combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)  # type: ignore # noqa
+        self.combo_box.view().setVerticalScrollBarPolicy(
+                              Qt.ScrollBarAsNeeded)    # type: ignore
         self.combo_box.setMaxVisibleItems(16)
         self.set_items(items)
         self.combo_box.setEditable(False)
