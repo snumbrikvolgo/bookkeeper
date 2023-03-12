@@ -109,7 +109,7 @@ class Bookkeeper:
         self.view.set_expenses_list(self.expenses)
         self.update_budget()
 
-    def modify_exp(self, pk: int, attr: str, value: str, old_val: str) -> None:
+    def modify_exp(self, pk: int, attr: str, value: str) -> None:
         """
         Изменить расход
         """

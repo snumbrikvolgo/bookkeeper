@@ -18,7 +18,7 @@ adder = lambda amount, name, comment: None
 def test_create_window(qtbot):
     budget_table = BudgetTable(budget=[], bdg_modifier=modifier)
     new_expense = NewExpense([], cats_edit_show, adder)
-    expenses_table = ExpensesTable([], deleter, modifier)
+    expenses_table = ExpensesTable([], deleter, modifier, pk_to_name)
     window = MainWindow(budget_table, new_expense, expenses_table)
     qtbot.addWidget(window)
     assert window.budget_table == budget_table
@@ -28,7 +28,7 @@ def test_create_window(qtbot):
 def test_close_event(qtbot):
         budget_table = BudgetTable(budget=[], bdg_modifier=modifier)
         new_expense = NewExpense([], cats_edit_show, adder)
-        expenses_table = ExpensesTable([], deleter, modifier)
+        expenses_table = ExpensesTable([], deleter, modifier, pk_to_name)
         window = MainWindow(budget_table, new_expense, expenses_table)
         qtbot.addWidget(window)
         assert window.close() == True

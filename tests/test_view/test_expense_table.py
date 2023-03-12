@@ -14,7 +14,7 @@ catpk_to_name = lambda pk: "1_3"
 exp_deleter = lambda exp_pks: None
 
 def test_add_data(qtbot):
-    widget = ExpensesTable([], exp_deleter, exp_modifier)
+    widget = ExpensesTable([], exp_deleter, exp_modifier, catpk_to_name)
     qtbot.addWidget(widget)
     widget.set_data(test_data)
     assert widget.table.data == test_data
@@ -28,7 +28,7 @@ def test_cell_changed(qtbot):
         assert pk == test_data[0][4]
         assert new_val == test_data[0][0]
     exp_modifier.was_called = False
-    widget = ExpensesTable([], exp_deleter, exp_modifier)
+    widget = ExpensesTable([], exp_deleter, exp_modifier, catpk_to_name)
     qtbot.addWidget(widget)
     widget.set_data(test_data)
     widget.table.cellChanged.emit(0,0)
@@ -38,14 +38,14 @@ def test_cell_changed(qtbot):
     assert exp_modifier.was_called == True
 
 def test_create_group(qtbot):
-    widget = ExpensesTable([], exp_deleter, exp_modifier)
+    widget = ExpensesTable([], exp_deleter, exp_modifier, catpk_to_name)
     qtbot.addWidget(widget)
     assert widget.table.data == []
     assert widget.exp_deleter == exp_deleter
     assert widget.exp_modifier == exp_modifier
 
 def test_set_expenses(qtbot):
-    widget = ExpensesTable([], exp_deleter, exp_modifier)
+    widget = ExpensesTable([], exp_deleter, exp_modifier, catpk_to_name)
     qtbot.addWidget(widget)
     exps = [Expense(100, 1, expense_date="12.12.2012 15:30", 
                             comment="test"), 
@@ -55,7 +55,7 @@ def test_set_expenses(qtbot):
     for exp, w_data in zip(exps, widget.table.data):
         assert str(exp.expense_date) == w_data[0]
         assert str(exp.amount) == w_data[1]
-        assert str(exp.category) == w_data[2]
+        assert catpk_to_name(exp.category) == w_data[2]
         assert str(exp.comment) == w_data[3]
         assert exp.pk == w_data[4]
 
@@ -64,7 +64,7 @@ def test_delete_expenses(qtbot):
         exp_deleter.was_called = True
         assert exp_pks == [2,3]
     exp_deleter.was_called = False
-    widget = ExpensesTable([], exp_deleter, exp_modifier)
+    widget = ExpensesTable([], exp_deleter, exp_modifier, catpk_to_name)
     qtbot.addWidget(widget)
     exps = [Expense(100, 1, pk=1), Expense(200, 2, pk=2),
             Expense(300, 3, pk=3), Expense(400, 4, pk=4),]

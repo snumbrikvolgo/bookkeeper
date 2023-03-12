@@ -13,7 +13,6 @@ from PySide6.QtCore import Qt
 from bookkeeper.view.labels import GroupLabelCenter
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
-from bookkeeper.models.category import Category
 
 
 class ExpensesTableWidget(QtWidgets.QTableWidget):
@@ -114,12 +113,11 @@ class ExpensesTable(QtWidgets.QGroupBox):
         """
         Изменение при двойном нажатии на ячейку таблицы
         """
-        old_val = self.table.item(row, column).text()
         self.table.cellChanged.disconnect(self.modify_exp)  # type: ignore
         pk = self.table.data[row][-1]
         new_val = self.table.item(row, column).text()
         attr = self.col_to_attr[column]
-        self.exp_modifier(pk, attr, new_val, old_val)  # type: ignore
+        self.exp_modifier(pk, attr, new_val)  # type: ignore
 
     def delete_exp(self) -> None:
         """
